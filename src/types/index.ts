@@ -12,10 +12,20 @@ export interface IProduct {
 	title: string;
 	category: string;
 	price: number | null;
-	//   button?: string
-	// index?: number
+	  button?: string
+	index?: number
 }
+//  категории товаров
+export type CategoryType =
+	| 'другое'
+	| 'софт-скил'
+	| 'дополнительное'
+	| 'кнопка'
+	| 'хард-скил';
 
+export type CategoryList = {
+	[Key in CategoryType]: string;
+};
 //Данные о пользователе
 export interface IUser {
 	payment?: string;
@@ -63,6 +73,7 @@ export interface IModelProducts {
 	clearUser(): boolean; //метод очистки данных о пользователе
 	getFormErrors(): void; //метод получения ошибок формы
 	getFieldPayment(): void; //метод получения полей
+	getBasket(): IProduct[]
 	
 }
 

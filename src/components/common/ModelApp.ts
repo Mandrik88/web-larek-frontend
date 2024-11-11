@@ -9,8 +9,8 @@ import {
 	FormErrors,
 	PaymentMethod,
 	IOrderResponse,
-} from '../../../types/index';
-// import { IEvents  } from '../base/events';
+} from '../../types';
+ import { IEvents  } from '../base/events';
 
 //класс ModelProducts ипользуется для управления состоянием приложения, является наследником класса Model, параметром которого явлется интерфейс IModelProduct
 export class ModelProducts extends Model<IModelProducts> {
@@ -22,7 +22,7 @@ export class ModelProducts extends Model<IModelProducts> {
 
   
 
-	//метод доюавления массива с товарами в модель
+	//метод добавления массива с товарами в модель
 	addProducts(cards: IProduct[]) {
 		this.items = cards;
 		this.events.emit('items:changed');
@@ -42,6 +42,7 @@ export class ModelProducts extends Model<IModelProducts> {
 	//метод добавления в корзину
 	addToBasket(card: IProduct) {
 		this.basket.push(card);
+		this.events.emit('basket:change', this.basket);
 	}
 
 	//метод провекри наличия товара в корзине
@@ -52,11 +53,13 @@ export class ModelProducts extends Model<IModelProducts> {
 	//метод удаления товара из корзины
 	deleteFromBasket(id: string) {
 		this.basket = this.basket.filter((item) => item.id !== id);
+		this.events.emit('basket:change', this.basket);
 	}
 
 	//метод очистки корзины
 	clearBasket() {
-		this.basket.length = 0;
+		this.basket = [];
+        this.events.emit('basket:change', this.basket);
 	}
 
 	//метод получения количества товаров в корзине
@@ -86,6 +89,11 @@ export class ModelProducts extends Model<IModelProducts> {
 	//метод получения полей c выбором тпа оплаты
 	getFieldPayment() {
 		return this.userData.payment;
+	}
+
+	//возвращает массив товаров в корзине
+	getBasket(): IProduct[] {
+		return this.basket;
 	}
 
 	//метод валидации формы с полями ввода addreess, email, phone
