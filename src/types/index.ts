@@ -48,8 +48,6 @@ export interface IForm {
 }
 //интерфейс корзины с суммой заказа и списком ID товаров
 export interface IOrderBasket {
-	// totalamount: number;
-	// productListItem: IProduct[];
 	list: HTMLElement[]; // Массив карточек в корзине
 	total: number; // Общая стоимость заказа
 }
