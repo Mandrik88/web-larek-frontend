@@ -19,7 +19,7 @@ export class Basket extends Component<IOrderBasket> {
 
 		if (this.button) {
 			this.button.addEventListener('click', () => {
-				events.emit('order:open');
+				events.emit('basket:placeOnOrder');
 			});
 		}
 

@@ -10,17 +10,25 @@ import {
 	PaymentMethod,
 	IOrderResponse,
 } from '../../types';
- import { IEvents  } from '../base/events';
 
+import { IEvents } from '../base/events';
 //класс ModelProducts ипользуется для управления состоянием приложения, является наследником класса Model, параметром которого явлется интерфейс IModelProduct
-export class ModelProducts extends Model<IModelProducts> {
+export class ModelProducts extends Model<IProduct> {
 	items: IProduct[] = []; //массив с карточками товаров
 	preview: string; //предварительный просмотр товара
 	basket: IProduct[] = []; //массив для хранения товаров добавленных в корзину
 	userData: IUser = {}; //свойство харнит информацию о пользователе
 	formErrors: FormErrors = {}; //свойство исп для хранения ошибок в форме валидации
 
-  
+	constructor(data: Partial<IProduct>, events: IEvents) {
+		super(data, events);
+		this.userData = {
+			payment: '',
+			address: '',
+			email: '',
+			phone: '',
+		};
+	}
 
 	//метод добавления массива с товарами в модель
 	addProducts(cards: IProduct[]) {
@@ -33,6 +41,11 @@ export class ModelProducts extends Model<IModelProducts> {
 		return this.items;
 	}
 
+	//метод для получения данных о пользователе
+	getUserInfo() {
+		return this.userData;
+	}
+
 	//метод предпросмотра карточки товара при клике на нее
 	setPreview(card: IProduct) {
 		this.preview = card.id;
@@ -40,11 +53,11 @@ export class ModelProducts extends Model<IModelProducts> {
 	}
 
 	//метод добавления в корзину
-	addToBasket(card: IProduct) {
-		this.basket.push(card);
+	addToBasket(id: string): void {
+		this.basket.push(this.getIdCard(id));
 		this.events.emit('basket:change', this.basket);
 	}
-
+	
 	//метод провекри наличия товара в корзине
 	isProductsInBasket(id: string): boolean {
 		return this.basket.some((item) => item.id === id);
@@ -72,6 +85,12 @@ export class ModelProducts extends Model<IModelProducts> {
 		return this.basket.map((item) => item.id);
 	}
 
+	//метод получения карточки по ID
+	getIdCard(id: string): IProduct {
+		return this.items.find((item) => item.id === id);
+	}
+
+
 	//метод получения общей стоимости товаров в корзине
 	getAllPrice() {
 		return this.basket.reduce((acc, item) => acc + item.price, 0);
@@ -80,6 +99,7 @@ export class ModelProducts extends Model<IModelProducts> {
 	//метод для заполнения полей с контактными данными пользователя
 	fillUsercontacts(field: keyof IUser, value: string): void {
 		this.userData[field] = value;
+		this.validateContact();
 	}
 
 	//метод получения ошибок формы

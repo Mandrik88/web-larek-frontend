@@ -1,9 +1,9 @@
 import { Form } from './Form'
-import { IOrderForm } from '../../types'
+import { IOrderForm, IUser } from '../../types'
 import { IEvents } from '../base/events'
 // import { ensureAllElements } from '../../utils/utils'
 
-export class Сontacts extends Form<IOrderForm> {
+export class Contacts extends Form<IUser> {
     constructor(container: HTMLFormElement, events: IEvents) {
       super(container, events);
     }
@@ -13,4 +13,8 @@ export class Сontacts extends Form<IOrderForm> {
     set email(value: string) {
       (this.container.elements.namedItem('email') as HTMLInputElement).value = value;
     }
+    clear() {
+      this.phone = '';
+      this.email = '';
+  }
   }

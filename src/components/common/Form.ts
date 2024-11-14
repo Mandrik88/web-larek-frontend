@@ -1,11 +1,8 @@
 import {Component} from "../base/Component";
 import {IEvents} from "../base/events";
 import {ensureElement} from "../../utils/utils";
+import { IForm } from "../../types";
 
-interface IForm {
-    valid: boolean;
-    errors: string[];
-}
 
 export class Form<T> extends Component<IForm> {
     protected _submit: HTMLButtonElement;
@@ -31,7 +28,7 @@ export class Form<T> extends Component<IForm> {
     }
 
     protected onInputChange(field: keyof T, value: string) {
-        this.events.emit(`${this.container.name}.${String(field)}:change`, {
+        this.events.emit('input:validate', {
             field,
             value
         });

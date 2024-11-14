@@ -1,34 +1,50 @@
 import { Form } from './Form'
-import { IOrderForm } from '../../types'
+import { IOrderForm, IUser } from '../../types'
 import { IEvents } from '../base/events'
-import { ensureAllElements } from '../../utils/utils'
+import { ensureElement } from '../../utils/utils'
 
-export class Order extends Form<IOrderForm> {
-    protected _buttons: HTMLButtonElement[];
+export class Order extends Form<IUser> {
+  protected buttonPayCash: HTMLButtonElement;
+	protected buttonPayCard: HTMLButtonElement;
   
     constructor(container: HTMLFormElement, events: IEvents) {
         super(container, events);
   
-        this._buttons = ensureAllElements<HTMLButtonElement>('.button_alt', container);
-  
-        this._buttons.forEach(button => {
-            button.addEventListener('click', () => {
-              this.payment = button.name; 
-              events.emit('payment:change', button)
-            });
-        })
+        this.buttonPayCash = ensureElement<HTMLButtonElement>(
+          '.button_alt[name=cash]',
+          container
+        );
+        this.buttonPayCard = ensureElement<HTMLButtonElement>(
+          '.button_alt[name=card]',
+          container
+        );
+    
+        this.buttonPayCash.addEventListener('click', () => {
+          this.onInputChange('payment', 'cash');
+        });
+        this.buttonPayCard.addEventListener('click', () => {
+          this.onInputChange('payment', 'card');
+        });
         
     }
-    set payment(name: string) {
-        this._buttons.forEach(button => {
-          this.toggleClass(button, 'button_alt-active', button.name === name);
-        });
-      }
+    set payment(value: string) {
+      this.buttonPayCash.classList.toggle('button_alt-active', value === 'cash');
+      this.buttonPayCard.classList.toggle('button_alt-active', value === 'card');
+    }
+  
+    disableButtons() {
+      this.buttonPayCard.classList.remove('button_alt-active');
+      this.buttonPayCash.classList.remove('button_alt-active');
+    }
+  
     
       set address(value: string) {
         (this.container.elements.namedItem('address') as HTMLInputElement).value = value;
       }
-    
+      clear() {
+        this.payment = null;
+        this.address = '';
+    }
     }
     
 
