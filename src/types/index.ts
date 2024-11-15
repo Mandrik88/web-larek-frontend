@@ -31,7 +31,7 @@ export interface IUser {
 	address?: string;
 	email?: string;
 	phone?: string;
-	total?: string | number;
+	
 }
 
 export interface IOrderForm {
@@ -39,6 +39,7 @@ export interface IOrderForm {
 	phone: string;
 	address: string;
 	payment: string;
+	total?: string | number;
 }
 
 //Интрефейс для валидации форм
@@ -49,11 +50,11 @@ export interface IForm {
 //интерфейс корзины с суммой заказа и списком ID товаров
 export interface IOrderBasket {
 	list: HTMLElement[]; // Массив карточек в корзине
-	total: number; // Общая стоимость заказа
+	total: string | number; // Общая стоимость заказа
 }
 
 // Данные о заказе
-export interface IOrderResponse extends IUser {
+export interface IOrderResponse extends IOrderForm {
 	items: string[]; // Идентификатор заказа
 }
 //Модель данных

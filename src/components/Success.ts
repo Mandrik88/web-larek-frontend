@@ -1,5 +1,5 @@
-import { ensureElement } from '../../utils/utils';
-import { Component } from '../base/Component';
+import { ensureElement } from '../utils/utils';
+import { Component } from './base/Component';
 
 export interface ISuccess {
 	total: number;
@@ -11,6 +11,7 @@ interface ISuccessActions {
 export class Success extends Component<ISuccess> {
 	protected _total: HTMLElement;
 	protected _close: HTMLElement;
+	
 
 	constructor(container: HTMLElement, actions: ISuccessActions) {
 		super(container);

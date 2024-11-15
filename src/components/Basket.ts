@@ -1,7 +1,7 @@
-import { IOrderBasket } from '../../types';
-import { Component } from '../base/Component';
-import { IEvents } from '../base/events';
-import { ensureElement, createElement } from '../../utils/utils';
+import { IOrderBasket } from '../types';
+import { Component } from './base/Component';
+import { IEvents } from './base/events';
+import { ensureElement, createElement } from '../utils/utils';
 
 export class Basket extends Component<IOrderBasket> {
 	totalamount: HTMLElement;

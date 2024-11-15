@@ -1,14 +1,12 @@
 // import { CategoryMap } from './../../types/index';
-import { Component } from '../base/Component';
-import { IProduct, CategoryType } from '../../types';
-import { ensureElement } from '../../utils/utils';
-import { categoryList, CDN_URL } from '../../utils/constants';
+import { Component } from './base/Component';
+import { IProduct, CategoryType } from '../types';
+import { ensureElement } from '../utils/utils';
+import { categoryList, CDN_URL } from '../utils/constants';
 
 export interface ICardActions {
 	onClick: (event: MouseEvent) => void;
-	price: number | null;
-	title: string;
-	index?: number;
+	
 }
 // interface ICard {
 // 	title: string;
@@ -21,7 +19,7 @@ export class Card extends Component<IProduct> {
 	protected _title: HTMLElement;
 	protected _price: HTMLElement;
 	protected _button?: HTMLButtonElement;
-	protected _index?: HTMLElement;
+	
 
 	constructor(container: HTMLElement, actions?: ICardActions) {
 		super(container);
@@ -31,7 +29,7 @@ export class Card extends Component<IProduct> {
 		// this._category = ensureElement<HTMLElement>('.card__category', container);
 		// this._image = ensureElement<HTMLImageElement>('.card__image', container);
 		this._button = container.querySelector('.card__button');
-		this._index = container.querySelector('.basket__item-index');
+		
 
 		if (actions?.onClick) {
 			if (this._button) {
@@ -42,9 +40,6 @@ export class Card extends Component<IProduct> {
 		}
 	}
 
-	set index(value: number) {
-		this.setText(this._index, value);
-	}
 	set button(value: string) {
 		if (this._button) {
 			this._button.textContent = value;
@@ -54,29 +49,32 @@ export class Card extends Component<IProduct> {
 		this.container.dataset.id = value;
 	}
 
-	set price(value: number) {
-		this.setText(this._price, value ? `${value} синапсов` : 'Бесценно');
-		if (this._button) {
-			this._button.disabled = !value;
+	set price(value: string) {
+		if(value === null) {
+			this.setText(this._price, `Бесценно`);
+		  } else {
+			this.setText(this._price, `${value} синапсов`);
+		  }
 		}
-	}
+	
 
 	set title(value: string) {
 		this.setText(this._title, value);
 	}
 }
 
-
 //данный класс отвечает за отображение карточки на странице
 export class OnlyCardOnPage extends Card {
 	_image: HTMLImageElement;
 	_category: HTMLElement;
+    _index?: HTMLElement;
 
 	constructor(container: HTMLElement, action?: ICardActions) {
 		super(container, action);
 
 		this._image = ensureElement<HTMLImageElement>('.card__image', container);
 		this._category = ensureElement<HTMLElement>('.card__category', container);
+		this._index = container.querySelector('.basket__item-index');
 	}
 
 	set image(value: string) {
@@ -86,6 +84,9 @@ export class OnlyCardOnPage extends Card {
 	set category(value: CategoryType) {
 		this.setText(this._category, value);
 		this.toggleClass(this._category, categoryList[value], true);
+	}
+	set index(value: number) {
+		this.setText(this._index, value);
 	}
 }
 

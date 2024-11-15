@@ -1,7 +1,7 @@
 // import { IUser } from './../../../types/index';
 // import { IProduct } from './../../../types/index';
 // import { IUser } from './../../../types/index';
-import { Model } from '../base/Model';
+import { Model } from './base/Model';
 import {
 	IProduct,
 	IUser,
@@ -9,15 +9,22 @@ import {
 	FormErrors,
 	PaymentMethod,
 	IOrderResponse,
-} from '../../types';
+	IOrderForm,
+} from '../types';
 
-import { IEvents } from '../base/events';
+import { IEvents } from './base/events';
 //класс ModelProducts ипользуется для управления состоянием приложения, является наследником класса Model, параметром которого явлется интерфейс IModelProduct
 export class ModelProducts extends Model<IProduct> {
 	items: IProduct[] = []; //массив с карточками товаров
 	preview: string; //предварительный просмотр товара
 	basket: IProduct[] = []; //массив для хранения товаров добавленных в корзину
-	userData: IUser = {}; //свойство харнит информацию о пользователе
+	userData: IOrderForm = {
+		email: '',
+		phone: '',
+		address: '',
+		payment: '',
+		total: ''
+	}; //свойство харнит информацию о пользователе
 	formErrors: FormErrors = {}; //свойство исп для хранения ошибок в форме валидации
 
 	constructor(data: Partial<IProduct>, events: IEvents) {
@@ -27,6 +34,7 @@ export class ModelProducts extends Model<IProduct> {
 			address: '',
 			email: '',
 			phone: '',
+			total: ''
 		};
 	}
 
@@ -99,9 +107,11 @@ export class ModelProducts extends Model<IProduct> {
 	//метод для заполнения полей с контактными данными пользователя
 	fillUsercontacts(field: keyof IUser, value: string): void {
 		this.userData[field] = value;
-		this.validateContact();
-	}
-
+		if (this.validateContact()) {
+			this.events.emit('order:ready', this.userData);
+		} 
+	  }
+	
 	//метод получения ошибок формы
 	getFormErrors() {
 		return this.formErrors;

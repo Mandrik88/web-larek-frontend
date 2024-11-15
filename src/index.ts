@@ -4,9 +4,9 @@ import { IProduct, IOrderResponse, IUser } from './types/index';
 import './scss/styles.scss';
 
 import { EventEmitter } from './components/base/events';
-import { ModelProducts } from './components/common/ModelApp';
+import { ModelProducts } from './components/ModelApp';
 import { API_URL, CDN_URL } from './utils/constants';
-import { ApiLarek } from './components/common/ApiLarek';
+import { ApiLarek } from './components/ApiLarek';
 // import { IOrderResponse, IProduct, IUser } from './types';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import {
@@ -14,13 +14,13 @@ import {
 	OnlyCardOnPage,
 	ICardActions,
 	CardPreview,
-} from './components/common/Cards';
-import { Page } from './components/common/Page';
+} from './components/Cards';
+import { Page } from './components/Page';
 import { Modal } from './components/common/Modal';
-import { Basket } from './components/common/Basket';
-import { Order } from './components/common/Order';
-import { Contacts } from './components/common/Contacts';
-import { Success, ISuccess } from './components/common/Success';
+import { Basket } from './components/Basket';
+import { Order } from './components/Order';
+import { Contacts } from './components/Contacts';
+import { Success, ISuccess } from './components/Success';
 import { Form } from './components/common/Form';
 
 const events = new EventEmitter();
@@ -62,9 +62,7 @@ const success = new Success(cloneTemplate(successTemplate), {
 events.on('items:changed', () => {
 	page.catalog = model.getProducts().map((item) => {
 		const card = new OnlyCardOnPage(cloneTemplate(catalogCardTemplate), {
-			onClick: () => events.emit('card:select', item),
-			price: item.price,
-			title: item.title,
+			onClick: () => events.emit('card:select', item)
 		});
 		return card.render({
 			title: item.title,
@@ -96,10 +94,9 @@ events.on('preview:change', (item: IProduct) => {
 				events.emit('card:toBasket', item);
 			}
 			modal.close();
-		},
-		price: item.price,
-		title: item.title,
-	} as ICardActions);
+		}
+	
+	} );
 
 	modal.render({
 		content: cardprePreview.render({
@@ -128,9 +125,7 @@ events.on('basket:change', () => {
 	basket.total = model.getAllPrice();
 	basket.list = model.getBasket().map((item, index) => {
 		const cardBasket = new Card(cloneTemplate(cardBasketTemplate), {
-			price: item.price,
-			title: item.title,
-			onClick: () => events.emit('basket:delete', item),
+			onClick: () => events.emit('basket:delete', item)
 		});
 		return cardBasket.render({
 			price: item.price,
@@ -144,7 +139,6 @@ events.on('card:toBasket', (item: IProduct) => {
 	// console.log('перед добавление товара', model.basket)
 	model.addToBasket(item.id);
 	// console.log('после добавление товара', model.basket)
-	events.emit('basket:change');
 });
 
 //удаляем товар из корзины
@@ -157,8 +151,6 @@ events.on('basket:delete', (item: IProduct) => {
 events.on('basket:placeOnOrder', () => {
 	console.log('Событие basket:placeOnOrder было вызвано!');
 	// очищаем форму и данные перед новым заказом
-	order.clear();
-	contacts.clear();
 	model.clearUser();
 	modal.render({
 		content: order.render({
@@ -166,23 +158,36 @@ events.on('basket:placeOnOrder', () => {
 			errors: [],
 			address: '',
 			payment: null,
+			phone: '',
+			email: ''
 		}),
 	});
 });
 
-// Изменение данных
+// Изменение теста ошибок
 events.on('input:error', (errors: Partial<IUser>) => {
+	// Обработка ошибок
+	handleErrors(errors);
+	// Обработка корректных данных
+	updateUserData(errors);
+});
+function handleErrors(errors: Partial<IUser>) {
+	// Извлекаем ошибки
 	const { payment, address, email, phone } = errors;
 	order.valid = !payment && !address;
 	contacts.valid = !email && !phone;
+	//формируем сообщения об ошибках
 	order.errors = Object.values({ address, payment })
 		.filter((i) => !!i)
 		.join('; ');
 	contacts.errors = Object.values({ phone, email })
 		.filter((i) => !!i)
 		.join('; ');
+}
+function updateUserData(_errors: Partial<IUser>) {
+	// Обновляем данные о платеже
 	order.payment = model.getFieldPayment();
-});
+}
 
 // ловим событие запуска валидации
 events.on('input:validate', (data: { field: keyof IUser; value: string }) => {
@@ -217,11 +222,11 @@ events.on('contacts:submit', () => {
 		items: items,
 	};
 
-	api.orderProductsResponse(payload)
+	api
+		.orderProductsResponse(payload)
 		.then((result) => {
 			events.emit('order:success', result);
 			model.clearBasket();
-			page.counter = model.getCountsInBasket();
 		})
 		.catch((error) => {
 			console.error('Ошибка отправки заказа:', error);
@@ -237,7 +242,6 @@ events.on('order:success', (result: ISuccess) => {
 	});
 	order.clear();
 	contacts.clear();
-	model.clearUser();
 	model.clearBasket();
 });
 // // Блокируем прокрутку страницы если открыта модалка

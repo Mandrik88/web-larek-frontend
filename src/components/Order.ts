@@ -1,7 +1,7 @@
-import { Form } from './Form'
-import { IOrderForm, IUser } from '../../types'
-import { IEvents } from '../base/events'
-import { ensureElement } from '../../utils/utils'
+import { Form } from './common/Form'
+import { IOrderForm, IUser } from '../types'
+import { IEvents } from './base/events'
+import { ensureElement } from '../utils/utils'
 
 export class Order extends Form<IUser> {
   protected buttonPayCash: HTMLButtonElement;
@@ -41,9 +41,14 @@ export class Order extends Form<IUser> {
       set address(value: string) {
         (this.container.elements.namedItem('address') as HTMLInputElement).value = value;
       }
-      clear() {
-        this.payment = null;
-        this.address = '';
+      clear(): void {
+        this.render ({
+          payment: null, 
+          address: '',
+          valid: false,
+          errors: []
+        })
+        
     }
     }
     

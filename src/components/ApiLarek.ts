@@ -1,6 +1,6 @@
- import { ApiPostMethods } from '../base/api';
-import { Api, ApiListResponse } from '../base/api'
-import { IProduct, IOrderResponse } from '../../types';
+ import { ApiPostMethods } from './base/api';
+import { Api, ApiListResponse } from './base/api'
+import { IProduct, IOrderResponse } from '../types';
 
 export class ApiLarek extends Api {
  readonly cdn: string;
