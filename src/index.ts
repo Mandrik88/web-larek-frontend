@@ -164,7 +164,7 @@ events.on('basket:placeOnOrder', () => {
 	});
 });
 
-// Изменение теста ошибок
+// Изменение текста ошибок
 events.on('input:error', (errors: Partial<IUser>) => {
 	// Обработка ошибок
 	handleErrors(errors);
