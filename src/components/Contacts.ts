@@ -14,15 +14,6 @@ export class Contacts extends Form<IUser> {
     set email(value: string) {
       (this.container.elements.namedItem('email') as HTMLInputElement).value = value;
     }
- 
-    // Передаем пустой объект в метод render для очистки
-    clear(): void {
-      // Вызываем render с пустыми значениями
-      this.render({
-        phone: '', 
-        email: '',
-        valid: false,
-        errors: []
-      });
+
   }
-  }
+  

@@ -18,13 +18,7 @@ export class ModelProducts extends Model<IProduct> {
 	items: IProduct[] = []; //массив с карточками товаров
 	preview: string; //предварительный просмотр товара
 	basket: IProduct[] = []; //массив для хранения товаров добавленных в корзину
-	userData: IOrderForm = {
-		email: '',
-		phone: '',
-		address: '',
-		payment: '',
-		total: ''
-	}; //свойство харнит информацию о пользователе
+	userData: IUser = {}; //свойство харнит информацию о пользователе
 	formErrors: FormErrors = {}; //свойство исп для хранения ошибок в форме валидации
 
 	constructor(data: Partial<IProduct>, events: IEvents) {
@@ -33,8 +27,7 @@ export class ModelProducts extends Model<IProduct> {
 			payment: '',
 			address: '',
 			email: '',
-			phone: '',
-			total: ''
+			phone: ''
 		};
 	}
 

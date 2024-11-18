@@ -41,15 +41,7 @@ export class Order extends Form<IUser> {
       set address(value: string) {
         (this.container.elements.namedItem('address') as HTMLInputElement).value = value;
       }
-      clear(): void {
-        this.render ({
-          payment: null, 
-          address: '',
-          valid: false,
-          errors: []
-        })
-        
-    }
+      
     }
     
 

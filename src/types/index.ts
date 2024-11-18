@@ -1,3 +1,4 @@
+// import { IOrderBasket } from './index';
 //модель для хранения товаров в каталоге
 export interface IProductData {
 	catalog: IProduct[];
@@ -31,7 +32,7 @@ export interface IUser {
 	address?: string;
 	email?: string;
 	phone?: string;
-	
+	// total?: string | number;
 }
 
 export interface IOrderForm {
@@ -39,7 +40,6 @@ export interface IOrderForm {
 	phone: string;
 	address: string;
 	payment: string;
-	total?: string | number;
 }
 
 //Интрефейс для валидации форм
@@ -50,12 +50,13 @@ export interface IForm {
 //интерфейс корзины с суммой заказа и списком ID товаров
 export interface IOrderBasket {
 	list: HTMLElement[]; // Массив карточек в корзине
-	total: string | number; // Общая стоимость заказа
+	 total: number; // Общая стоимость заказа
 }
 
 // Данные о заказе
-export interface IOrderResponse extends IOrderForm {
-	items: string[]; // Идентификатор заказа
+export interface IOrderResponse extends IUser {
+	items: string[]; 
+	total: number;
 }
 //Модель данных
 export interface IModelProducts {

@@ -1,6 +1,7 @@
-import { CategoryType, IProductData } from './types/index';
+import { IProductData } from './types/index';
+import { CategoryType } from './types/index';
 // import { Page } from './components/common/Page';
-import { IProduct, IOrderResponse, IUser } from './types/index';
+import { IProduct, IOrderResponse, IUser, IOrderBasket } from './types/index';
 import './scss/styles.scss';
 
 import { EventEmitter } from './components/base/events';
@@ -9,12 +10,7 @@ import { API_URL, CDN_URL } from './utils/constants';
 import { ApiLarek } from './components/ApiLarek';
 // import { IOrderResponse, IProduct, IUser } from './types';
 import { cloneTemplate, ensureElement } from './utils/utils';
-import {
-	Card,
-	OnlyCardOnPage,
-	ICardActions,
-	CardPreview,
-} from './components/Cards';
+import { Card, OnlyCardOnPage, CardWithIndex, CardPreview } from './components/Cards';
 import { Page } from './components/Page';
 import { Modal } from './components/common/Modal';
 import { Basket } from './components/Basket';
@@ -62,9 +58,10 @@ const success = new Success(cloneTemplate(successTemplate), {
 events.on('items:changed', () => {
 	page.catalog = model.getProducts().map((item) => {
 		const card = new OnlyCardOnPage(cloneTemplate(catalogCardTemplate), {
-			onClick: () => events.emit('card:select', item)
+			onClick: () => events.emit('card:select', item),
 		});
 		return card.render({
+			id: item.id,
 			title: item.title,
 			category: item.category as CategoryType,
 			image: api.cdn + item.image,
@@ -84,8 +81,11 @@ events.on('preview:change', (item: IProduct) => {
 	// console.log('Preview data received:', item);
 
 	const productInBasket = model.isProductsInBasket(item.id);
-	// console.log('Product in basket:', productInBasket);//Проверка наличия продукта в корзине
-
+	console.log('Product in basket:', productInBasket); //Проверка наличия продукта в корзине
+	console.log(
+		'Button text:',
+		productInBasket ? 'Удалить из корзины' : 'В корзину'
+	);
 	const cardprePreview = new CardPreview(cloneTemplate(cardPreviewTemplate), {
 		onClick: () => {
 			if (productInBasket) {
@@ -94,9 +94,8 @@ events.on('preview:change', (item: IProduct) => {
 				events.emit('card:toBasket', item);
 			}
 			modal.close();
-		}
-	
-	} );
+		},
+	});
 
 	modal.render({
 		content: cardprePreview.render({
@@ -124,9 +123,10 @@ events.on('basket:change', () => {
 	page.counter = model.getCountsInBasket();
 	basket.total = model.getAllPrice();
 	basket.list = model.getBasket().map((item, index) => {
-		const cardBasket = new Card(cloneTemplate(cardBasketTemplate), {
-			onClick: () => events.emit('basket:delete', item)
+		const cardBasket = new CardWithIndex(cloneTemplate(cardBasketTemplate), {
+			onClick: () => events.emit('basket:delete', item),
 		});
+		// cardBasket.index = index + 1;
 		return cardBasket.render({
 			price: item.price,
 			title: item.title,
@@ -144,22 +144,21 @@ events.on('card:toBasket', (item: IProduct) => {
 //удаляем товар из корзины
 events.on('basket:delete', (item: IProduct) => {
 	model.deleteFromBasket(item.id);
-	events.emit('basket:change');
 });
 
 // начало формления заказа (событие нажатия на кнопку "оформить")
 events.on('basket:placeOnOrder', () => {
 	console.log('Событие basket:placeOnOrder было вызвано!');
 	// очищаем форму и данные перед новым заказом
+	const userInfo = model.getUserInfo(); //из модели получаю данные пользователя
+
 	model.clearUser();
 	modal.render({
 		content: order.render({
 			valid: false,
 			errors: [],
-			address: '',
-			payment: null,
-			phone: '',
-			email: ''
+			address: userInfo.address,
+			payment: userInfo.payment,
 		}),
 	});
 });
@@ -207,20 +206,25 @@ events.on('order:submit', () => {
 
 // отправляем контактные данные
 events.on('contacts:submit', () => {
-	// console.log('вызвали contact:submit')
+	console.log('вызвали contact:submit');
 	const orderInfo = model.getUserInfo();
-	orderInfo.total = model.getAllPrice();
+	// orderInfo.total = model.getAllPrice()
+	// console.log('работает', orderInfo);
+	// Получаем общую стоимость заказа из модел
 
 	const items = model.getIdProductsInBasket();
+	// console.log(items);
 
+	// Формируем payload для отправки
 	const payload: IOrderResponse = {
 		payment: orderInfo.payment,
 		address: orderInfo.address,
 		email: orderInfo.email,
 		phone: orderInfo.phone,
-		total: orderInfo.total,
+		total: model.getAllPrice(),
 		items: items,
 	};
+	// console.log('Payload для отправки:', payload);
 
 	api
 		.orderProductsResponse(payload)
@@ -240,8 +244,8 @@ events.on('order:success', (result: ISuccess) => {
 			total: result.total,
 		}),
 	});
-	order.clear();
-	contacts.clear();
+	// order.clear();
+	// contacts.clear();
 	model.clearBasket();
 });
 // // Блокируем прокрутку страницы если открыта модалка
@@ -261,3 +265,6 @@ api
 	.catch((err) => {
 		console.log(err);
 	});
+
+// const userAddress = model.userData.address;
+// console.log('User Address:', userAddress);
